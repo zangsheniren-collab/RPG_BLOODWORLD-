@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1015"><title>BLOODWORLD RPG</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app-shell">
+<header class="topbar"><div class="logo">BLOOD<span>WORLD</span><small> ROLE PLAYING GAME</small></div><div class="version">BUILD 0.2.0</div></header>
+<main>
+<section id="titleScreen" class="screen active">
+ <div class="title-art"><div class="title-kicker">THE WORLD HAS CHANGED AGAIN</div><h1>BLOOD<span>WORLD</span></h1><p>未知なるウイルスの、その先に現れたもの。</p><div class="title-stamp">KYOKYO DISTRICT // INCIDENT 001</div></div>
+ <div class="title-actions"><button class="btn primary" id="newGameBtn">NEW GAME</button><button class="btn" id="continueBtn">CONTINUE</button><button class="btn" id="helpBtn">操作説明</button></div>
+ <p class="title-note">第一章：魔物発生編 — 飢京・中央街区</p>
+</section>
+
+<section id="creatorScreen" class="screen panel">
+ <div class="section-heading"><div><span class="eyebrow">CHARACTER INITIALIZATION</span><h2>主人公を作成</h2></div><span class="step">01 / 01</span></div>
+ <p class="muted">職業による制限はありません。能力値と自作スキルで、自分だけの戦い方を作成してください。</p>
+ <div class="creator-grid">
+  <div class="subpanel">
+   <label>キャラクター名<input id="playerName" maxlength="20" value="名無し"></label>
+   <label>ドット絵を読み込む<input id="playerImage" type="file" accept="image/png,image/webp,image/gif"></label>
+   <div class="preview-wrap"><div class="avatar-frame"><img id="avatarPreview" alt=""><span id="avatarFallback">?</span></div><div class="muted">透過PNG推奨。画像なしでも開始できます。</div></div>
+   <label>初期スキル名<input id="initialSkillName" maxlength="24" value="渾身の一撃"></label>
+   <label>スキル説明<input id="initialSkillDesc" maxlength="100" value="力を込めた単体攻撃。"></label>
+  </div>
+  <div class="subpanel">
+   <div class="points-line"><b>初期能力値</b><span>残りポイント <strong id="pointsLeft">30</strong></span></div>
+   <div id="statEditor"></div>
+   <p class="hint">各能力の基礎値は5。追加30ポイントを配分できます。</p>
+  </div>
+ </div>
+ <div class="actions"><button class="btn" id="creatorBack">戻る</button><button class="btn primary" id="startGameBtn">このキャラクターで開始</button></div>
+</section>
+
+<section id="gameScreen" class="screen">
+ <nav class="game-nav">
+  <button class="nav-btn" data-panel="status">STATUS</button><button class="nav-btn" data-panel="skills">SKILLS</button><button class="nav-btn" data-panel="develop">DEVELOP</button><button class="nav-btn" data-panel="items">ITEMS</button><button class="nav-btn" data-panel="save">SAVE</button>
+ </nav>
+ <div class="game-layout">
+  <section class="world-panel">
+   <div class="location-head"><div><span class="eyebrow">KYOKYO / SECTOR 01</span><h2>飢京・中央街区</h2></div><div class="weather">濃霧 <span>●</span> 19:42</div></div>
+   <div class="map-frame"><canvas id="world" width="800" height="520" aria-label="探索マップ"></canvas><div class="map-overlay"><span>探索区域：中央街区</span><span id="mapCoords">X:04 Y:04</span></div></div>
+   <div class="objective-card"><div class="objective-icon">!</div><div><small>NEXT OBJECTIVE / 次の目的地</small><b id="objectiveText">黄色く発光する避難民に話しかける</b><p id="objectiveSub">マップ上の光るマーカーを目印に進もう。</p></div><span class="pulse-dot"></span></div>
+   <div class="control-area">
+    <div class="dpad"><i></i><button data-move="0,-1">▲</button><i></i><button data-move="-1,0">◀</button><button id="interactBtn" class="interact">調べる</button><button data-move="1,0">▶</button><i></i><button data-move="0,1">▼</button><i></i></div>
+    <div class="control-help">移動：WASD / 矢印キー　調べる：Space / Enter</div>
+   </div>
+  </section>
+  <aside class="sidebar">
+   <div class="side-card player-card"><div class="side-title">PLAYER DATA <span>● ONLINE</span></div><div class="player-name"><div class="mini-avatar" id="miniAvatar">?</div><div><b id="hudName">主人公</b><small id="hudLevel">Lv.1　EXP 0/35</small></div></div>
+    <div class="resource"><div><span>HP</span><b id="hudHp">0/0</b></div><div class="meter"><i id="hpMeter"></i></div></div>
+    <div class="resource"><div><span>MP</span><b id="hudMp">0/0</b></div><div class="meter mp"><i id="mpMeter"></i></div></div>
+    <div class="quick-stats"><span>STR <b id="hudStr">5</b></span><span>VIT <b id="hudVit">5</b></span><span>INT <b id="hudInt">5</b></span><span>AGI <b id="hudAgi">5</b></span></div>
+   </div>
+   <div class="side-card"><div class="side-title">PARTY <span>01 / 04</span></div><div class="party-slot"><span class="slot-icon">◆</span><div><b id="partyName">主人公</b><small>操作キャラクター</small></div><em>ACTIVE</em></div><div class="muted tiny">仲間枠は今後のアップデートで追加予定。</div></div>
+   <div class="side-card"><div class="side-title">FIELD LOG <span>記録</span></div><div id="fieldLog" class="field-log"><p>飢京に到着した。周囲を調べよう。</p></div></div>
+   <div class="side-card"><div class="side-title">QUICK ITEM</div><button class="quick-item" id="quickPotion">応急薬を使用 <b id="potionCount">×3</b></button></div>
+  </aside>
+ </div>
+</section>
+</main>
+<footer>© BLOODWORLD PROJECT · Browser RPG prototype · v0.2.0</footer>
+</div>
+
+<div id="modal" class="modal"><div class="modal-window"><div class="modal-head"><div><span class="eyebrow" id="modalEyebrow">SYSTEM</span><h2 id="modalTitle">MENU</h2></div><button id="modalClose" class="close-btn">×</button></div><div id="modalContent"></div></div></div>
+<script src="game-data.js"></script><script src="game.js"></script>
+</body></html>
