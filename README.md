@@ -1,0 +1,2 @@
+# RPG_BLOODWORLD-
+BLOODWORLDの世界観でRPGを遊べるようにしたゲームである。自分だけのキャラクターを作成していこう。
